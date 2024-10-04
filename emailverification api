@@ -1,0 +1,58 @@
+// Import the express module
+const express = require('express');
+const app = express();
+
+// Middleware to parse JSON data
+app.use(express.json());
+
+// Sample data (in place of a real database)
+let items = [
+    { id: 1, name: 'Item 1' },
+    { id: 2, name: 'Item 2' },
+];
+
+// GET route to fetch all items
+app.get('/api/items', (req, res) => {
+    res.json(items);
+});
+
+// GET route to fetch a single item by ID
+app.get('/api/items/:id', (req, res) => {
+    const item = items.find(i => i.id === parseInt(req.params.id));
+    if (!item) return res.status(404).send('Item not found');
+    res.json(item);
+});
+
+// POST route to create a new item
+app.post('/api/items', (req, res) => {
+    const newItem = {
+        id: items.length + 1,
+        name: req.body.name
+    };
+    items.push(newItem);
+    res.status(201).json(newItem);
+});
+
+// PUT route to update an item
+app.put('/api/items/:id', (req, res) => {
+    const item = items.find(i => i.id === parseInt(req.params.id));
+    if (!item) return res.status(404).send('Item not found');
+    
+    item.name = req.body.name;
+    res.json(item);
+});
+
+// DELETE route to delete an item
+app.delete('/api/items/:id', (req, res) => {
+    const itemIndex = items.findIndex(i => i.id === parseInt(req.params.id));
+    if (itemIndex === -1) return res.status(404).send('Item not found');
+    
+    items.splice(itemIndex, 1);
+    res.status(204).send(); // No content, as the item has been deleted
+});
+
+// Start the server
+const port = 3000;
+app.listen(port, () => {
+    console.log(`API server running at http://localhost:${port}`);
+});
